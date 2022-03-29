@@ -6,7 +6,6 @@ const handleDomo = (e) => {
   const name = e.target.querySelector("#domoName").value;
   const age = e.target.querySelector("#domoAge").value;
   const _csrf = e.target.querySelector("#_csrf").value;
-  console.log("handleDomo", name, age, _csrf);
   if (!name || !age) {
     helper.handleError("All fields are required!");
     return false;

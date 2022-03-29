@@ -34,7 +34,6 @@ const handleSignup = (e) => {
 };
 
 const LoginWindow = (props) => {
-  console.log(props);
   return (
     <form
       id="loginForm"
@@ -84,7 +83,6 @@ const SignupWindow = (props) => {
 const init = async () => {
   const response = await fetch("/getToken");
   const data = await response.json();
-  console.log("data", data);
   const loginButton = document.getElementById("loginButton");
   const signupButton = document.getElementById("signupButton");
 
