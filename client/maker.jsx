@@ -14,6 +14,24 @@ const handleDomo = (e) => {
   return false;
 };
 
+const handlePikachu = (e) => {
+  e.preventDefault();
+  helper.hideError();
+  const name = e.target.querySelector("#pikachuName").value;
+  const level = e.target.querySelector("#pikachuLevel").value;
+  const _csrf = e.target.querySelector("#_csrf").value;
+  if (!name || !level) {
+    helper.handleError("All fields are required!");
+    return false;
+  }
+  helper.sendPost(
+    e.target.action,
+    { name, level, _csrf },
+    loadPikachusFromServer
+  );
+  return false;
+};
+
 const DomoForm = (props) => {
   return (
     <form
@@ -30,6 +48,31 @@ const DomoForm = (props) => {
       <input id="domoAge" type="number" min="0" name="age" />
       <input id="_csrf" type="hidden" name="_csrf" value={props.csrf} />
       <input className="makeDomoSubmit" type="submit" value="Make Domo" />
+    </form>
+  );
+};
+
+const PikachuForm = (props) => {
+  return (
+    <form
+      id="pikachuForm"
+      onSubmit={handlePikachu}
+      name="pikachuForm"
+      action="/makePikachu"
+      method="POST"
+      className="pikachuForm"
+    >
+      <label htmlFor="name">Name: </label>
+      <input
+        id="pikachuName"
+        type="text"
+        name="name"
+        placeholder="Pikachu Name"
+      />
+      <label htmlFor="level">Level: </label>
+      <input id="pikachuLevel" type="number" min="1" name="level" />
+      <input id="_csrf" type="hidden" name="_csrf" value={props.csrf} />
+      <input className="makePikachuSubmit" type="submit" value="Make Pikachu" />
     </form>
   );
 };
@@ -59,12 +102,48 @@ const DomoList = (props) => {
   return <div className="domoList">{domoNodes} </div>;
 };
 
+const PikachuList = (props) => {
+  console.log(props);
+  if (props.pikachus.length === 0) {
+    return (
+      <div className="pikachuList">
+        <h3 className="emptyPikachu">No Pikachus Yet!</h3>
+      </div>
+    );
+  }
+
+  const pikachuNodes = props.pikachus.map((pikachu) => {
+    return (
+      <div key={pikachu._id} className="pikachu">
+        <img
+          src="/assets/img/pikachuface.jpeg"
+          alt="pikachu face"
+          className="pikachuFace"
+        />
+        <h3 className="pikachuName"> Name: {pikachu.name} </h3>
+        <h3 className="pikachuLevel"> Level: {pikachu.level} </h3>
+      </div>
+    );
+  });
+  return <div className="pikachuList">{pikachuNodes} </div>;
+};
+
 const loadDomosFromServer = async () => {
   const response = await fetch("/getDomos");
   const data = await response.json();
   ReactDOM.render(
     <DomoList domos={data.domos} />,
     document.getElementById("domos")
+  );
+};
+
+const loadPikachusFromServer = async () => {
+  const response = await fetch("/getPikachus");
+  const data = await response.json();
+  console.log(data);
+  ReactDOM.render(
+    <PikachuList pikachus={data.pikachus} />,
+    document.getElementById("pikachus")
   );
 };
 
@@ -75,8 +154,17 @@ const init = async () => {
     <DomoForm csrf={data.csrfToken} />,
     document.getElementById("makeDomo")
   );
+  ReactDOM.render(
+    <PikachuForm csrf={data.csrfToken} />,
+    document.getElementById("makePikachu")
+  );
   ReactDOM.render(<DomoList domos={[]} />, document.getElementById("domos"));
+  ReactDOM.render(
+    <PikachuList pikachus={[]} />,
+    document.getElementById("pikachus")
+  );
   loadDomosFromServer();
+  loadPikachusFromServer();
 };
 
 window.onload = init;
